@@ -23,9 +23,9 @@ impl UserManager {
         }
     }
 
-    pub fn insert(&mut self, user: UserRegister) -> Result<usize, diesel::result::Error> {
+    pub fn insert(&mut self, user:&UserRegister) -> Result<usize, diesel::result::Error> {
         insert_into(users)
-            .values(&user)
+            .values(user)
             .execute(&mut self.connection)
     }
 

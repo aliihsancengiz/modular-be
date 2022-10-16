@@ -16,9 +16,9 @@ async fn login(user: web::Json<models::user::UserLogin>) -> HttpResponse {
 
 #[post("/register")]
 async fn register(user: web::Json<models::user::UserRegister>) -> HttpResponse {
-    let usr = user.into_inner();
+    let mut usr = user.into_inner();
     let mut ep = UserEndpoint::new();
-    match ep.register(usr) {
+    match ep.register(&mut usr) {
         Some(resp) => HttpResponse::Ok().json(resp),
         None => HttpResponse::Conflict().json("Cannot register user."),
     }
