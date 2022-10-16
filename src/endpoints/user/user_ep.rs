@@ -1,15 +1,12 @@
-use actix_web::http::StatusCode;
-use actix_web::{post, get, web, HttpRequest, HttpResponse};
+use actix_web::{post, web, HttpRequest, HttpResponse};
 use crate::models;
 
 
 #[post("/login")]
 async fn login(user : web::Json<models::user::UserLogin>) -> HttpResponse {
-	
 	let usr = user.into_inner();
 	println!("Login Request : {} {}",usr.username,usr.password);
 	HttpResponse::Ok().json("Hello from login.")
-
 }
 
 #[post("/register")]

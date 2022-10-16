@@ -2,10 +2,10 @@
 
 mod endpoints;
 mod models;
+mod schema;
+mod managers;
 
 use actix_web::{middleware, web, App, HttpServer};
-
-use endpoints::user::*;
 
 
 #[actix_rt::main]
