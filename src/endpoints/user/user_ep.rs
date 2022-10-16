@@ -1,5 +1,7 @@
 use crate::managers::um::UserManager;
 use crate::models::user::{UserLogin, UserRegister};
+use crypto::sha2::Sha256;
+use crypto::digest::Digest;
 
 pub struct UserEndpoint {
     um: UserManager,
@@ -15,7 +17,10 @@ impl UserEndpoint {
     pub fn login(&mut self, user: UserLogin) -> Option<String> {
         match self.um.find_by_username(&user.username) {
             Some(x) => {
-                if x.password == user.password {
+                let mut sha = Sha256::new();
+                sha.input_str(user.password.as_str());
+
+                if x.password == sha.result_str() {
                     Some("Successfully logged in.".to_string())
                 } else {
                     None
@@ -25,13 +30,18 @@ impl UserEndpoint {
         }
     }
 
-    pub fn register(&mut self, user: UserRegister) -> Option<String> {
+    pub fn register(&mut self, user:&mut UserRegister) -> Option<String> {
         match self.um.find_by_username(&user.username) {
             Some(_) => None,
-            None => match self.um.insert(user) {
-                Ok(_) => Some("Successfully registered user.".to_string()),
-                Err(_) => None,
-            },
+            None => {
+                let mut sha = Sha256::new();
+                sha.input_str(user.password.as_str());
+                user.password = sha.result_str();
+                match self.um.insert(user) {
+                    Ok(_) => Some("Successfully registered user.".to_string()),
+                    Err(_) => None,
+                }
+            }
         }
     }
 

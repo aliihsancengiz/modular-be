@@ -6,7 +6,6 @@ mod models;
 mod schema;
 
 use actix_web::{middleware, web, App, HttpServer};
-use managers::um::UserManager;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
