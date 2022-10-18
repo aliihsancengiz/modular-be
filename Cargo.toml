@@ -14,3 +14,5 @@ env_logger = "0.9.1"
 diesel = { version = "2.0.0", features = ["sqlite"] }
 envfile = "0.2.1"
 rust-crypto = "0.2.36"
+jsonwebtoken = "8.1.1"
+chrono = "0.4.22"

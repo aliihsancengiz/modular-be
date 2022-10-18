@@ -23,3 +23,8 @@ pub struct UserLogin {
     pub username: String,
     pub password: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UserLoginResponse {
+    pub token: String,
+}

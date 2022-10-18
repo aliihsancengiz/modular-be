@@ -23,7 +23,7 @@ impl UserManager {
         }
     }
 
-    pub fn insert(&mut self, user:&UserRegister) -> Result<usize, diesel::result::Error> {
+    pub fn insert(&mut self, user: &UserRegister) -> Result<usize, diesel::result::Error> {
         insert_into(users)
             .values(user)
             .execute(&mut self.connection)
@@ -42,15 +42,6 @@ impl UserManager {
             ))
             .execute(&mut self.connection)
             .unwrap();
-    }
-
-    pub fn find(&mut self, _id: i32) -> Result<User, bool> {
-        if let Ok(res) = users.find(_id).load::<User>(&mut self.connection) {
-            let usr = res.first().cloned();
-            Ok(usr.unwrap())
-        } else {
-            Err(false)
-        }
     }
 
     pub fn find_by_username(&mut self, user_name: &String) -> Option<User> {

@@ -1,27 +1,32 @@
+use crate::managers::token::Tokeniser;
 use crate::managers::um::UserManager;
-use crate::models::user::{UserLogin, UserRegister};
-use crypto::sha2::Sha256;
+use crate::models::user::{UserLogin, UserLoginResponse, UserRegister};
 use crypto::digest::Digest;
+use crypto::sha2::Sha256;
 
 pub struct UserEndpoint {
     um: UserManager,
+    tokeniser: Tokeniser,
 }
 
 impl UserEndpoint {
     pub fn new() -> Self {
         Self {
             um: UserManager::new(),
+            tokeniser: Tokeniser::new(),
         }
     }
 
-    pub fn login(&mut self, user: UserLogin) -> Option<String> {
+    pub fn login(&mut self, user: UserLogin) -> Option<UserLoginResponse> {
         match self.um.find_by_username(&user.username) {
-            Some(x) => {
+            Some(_usr) => {
                 let mut sha = Sha256::new();
                 sha.input_str(user.password.as_str());
 
-                if x.password == sha.result_str() {
-                    Some("Successfully logged in.".to_string())
+                if _usr.password == sha.result_str() {
+                    Some(UserLoginResponse {
+                        token: self.tokeniser.generate_tokens(_usr, 2),
+                    })
                 } else {
                     None
                 }
@@ -30,7 +35,7 @@ impl UserEndpoint {
         }
     }
 
-    pub fn register(&mut self, user:&mut UserRegister) -> Option<String> {
+    pub fn register(&mut self, user: &mut UserRegister) -> Option<String> {
         match self.um.find_by_username(&user.username) {
             Some(_) => None,
             None => {
