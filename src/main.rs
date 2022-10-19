@@ -17,6 +17,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(web::resource("/hello").to(|| async { "Hello world!" }))
             .service(web::scope("/user").configure(endpoints::user::init_routes))
+			.service(web::scope("/authentication").configure(endpoints::authentication::init_routes))
     })
     .bind("127.0.0.1:8080")?
     .run()
