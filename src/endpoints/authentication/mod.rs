@@ -4,7 +4,6 @@ use crate::models;
 use actix_web::{post, web, HttpResponse};
 use authentication::AuthEndpoint;
 
-
 #[post("/login")]
 async fn auth(user: web::Json<models::auth::UserLoginRequest>) -> HttpResponse {
     let usr = user.into_inner();
