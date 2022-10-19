@@ -15,9 +15,10 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
-            .service(web::resource("/hello").to(|| async { "Hello world!" }))
             .service(web::scope("/api/user").configure(endpoints::user::init_routes))
-			.service(web::scope("/api/authentication").configure(endpoints::authentication::init_routes))
+            .service(
+                web::scope("/api/authentication").configure(endpoints::authentication::init_routes),
+            )
     })
     .bind("127.0.0.1:8080")?
     .run()

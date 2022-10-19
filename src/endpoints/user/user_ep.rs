@@ -1,5 +1,5 @@
 use crate::managers::um::UserManager;
-use crate::models::user::{UserRegister,User};
+use crate::models::user::{User, UserRegister};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 
@@ -29,10 +29,10 @@ impl UserEndpoint {
         }
     }
 
-    pub fn all(&mut self) -> Option<Vec<User>>{
+    pub fn all(&mut self) -> Option<Vec<User>> {
         match self.um.all() {
-			Ok(res) => Some(res),
-			Err(_) => None,
-		}
+            Ok(res) => Some(res),
+            Err(_) => None,
+        }
     }
 }

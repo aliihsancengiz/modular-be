@@ -4,8 +4,7 @@ use crate::models::auth::{UserLoginRequest, UserLoginResponse};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 
-pub struct AuthEndpoint
-{
+pub struct AuthEndpoint {
     um: UserManager,
     tokeniser: Tokeniser,
 }
@@ -18,8 +17,8 @@ impl AuthEndpoint {
         }
     }
 
-	pub fn auth(&mut self, user: UserLoginRequest) -> Option<UserLoginResponse> {
-		match self.um.find_by_username(&user.username) {
+    pub fn auth(&mut self, user: UserLoginRequest) -> Option<UserLoginResponse> {
+        match self.um.find_by_username(&user.username) {
             Some(usr) => {
                 let mut sha = Sha256::new();
                 sha.input_str(user.password.as_str());
@@ -34,6 +33,5 @@ impl AuthEndpoint {
             }
             None => None,
         }
-	}
-
+    }
 }
