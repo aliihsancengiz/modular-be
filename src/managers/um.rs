@@ -6,7 +6,7 @@ use diesel::insert_into;
 use diesel::prelude::*;
 
 use crate::managers::db::DatabaseManager;
-use crate::models::user::{User, UserRegister};
+use crate::models::user::User;
 use crate::schema::schema::users::dsl::users;
 use crate::schema::schema::users::*;
 
@@ -23,7 +23,7 @@ impl UserManager {
         }
     }
 
-    pub fn insert(&mut self, user: &UserRegister) -> Result<usize, diesel::result::Error> {
+    pub fn insert(&mut self, user: &User) -> Result<usize, diesel::result::Error> {
         insert_into(users)
             .values(user)
             .execute(&mut self.connection)
@@ -33,15 +33,16 @@ impl UserManager {
         users.load::<User>(&mut self.connection)
     }
 
-    pub fn update(&mut self, usr: User) {
-        diesel::update(users.filter(id.eq(usr.id)))
+    pub fn update(&mut self, usr: User) -> usize {
+        let name = usr.clone().username;
+        diesel::update(users.filter(username.eq(&name)))
             .set((
                 username.eq(usr.username),
                 email.eq(usr.email),
                 password.eq(usr.password),
             ))
             .execute(&mut self.connection)
-            .unwrap();
+            .unwrap()
     }
 
     pub fn find_by_username(&mut self, user_name: &String) -> Option<User> {
@@ -52,5 +53,11 @@ impl UserManager {
             Ok(x) => Some(x),
             Err(_) => None,
         }
+    }
+
+    pub fn delete(&mut self, user: User) -> usize {
+        diesel::delete(users.filter(username.eq(user.username)))
+            .execute(&mut self.connection)
+            .unwrap()
     }
 }

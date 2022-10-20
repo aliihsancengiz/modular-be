@@ -2,26 +2,32 @@ pub mod user_ep;
 
 use crate::managers::auth::AuthorizationService;
 use crate::models;
-use actix_web::{get, http::header::ContentType, post, web, HttpResponse};
+use actix_web::{
+    delete, get,
+    http::header::ContentType,
+    post, put,
+    web::{self},
+    HttpResponse,
+};
 use user_ep::UserEndpoint;
 
-#[post("/register")]
-async fn register(
-    user: web::Json<models::user::UserRegister>,
+#[post("")]
+async fn registerall_user(
+    user: web::Json<models::user::User>,
     _: AuthorizationService,
 ) -> HttpResponse {
     let mut usr = user.into_inner();
-    let mut ep = UserEndpoint::new();
-    match ep.register(&mut usr) {
+    let mut ep_manager = UserEndpoint::new();
+    match ep_manager.register(&mut usr) {
         Some(resp) => HttpResponse::Ok().json(resp),
         None => HttpResponse::Conflict().json("Cannot register user."),
     }
 }
 
-#[get("/all")]
-async fn all(_: AuthorizationService) -> HttpResponse {
-    let mut ep = UserEndpoint::new();
-    match ep.all() {
+#[get("")]
+async fn get_all_user(_: AuthorizationService) -> HttpResponse {
+    let mut ep_manager = UserEndpoint::new();
+    match ep_manager.all() {
         Some(resp) => HttpResponse::Ok()
             .content_type(ContentType::json())
             .json(resp),
@@ -29,7 +35,27 @@ async fn all(_: AuthorizationService) -> HttpResponse {
     }
 }
 
+#[put("")]
+async fn update_user(user: web::Json<models::user::User>, _: AuthorizationService) -> HttpResponse {
+    let mut ep_manager = UserEndpoint::new();
+    match ep_manager.update(&mut user.into_inner()) {
+        Some(resp_str) => HttpResponse::Ok().json(resp_str),
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
+#[delete("")]
+async fn delete_user(user: web::Json<models::user::User>, _: AuthorizationService) -> HttpResponse {
+    let mut ep_manager = UserEndpoint::new();
+    match ep_manager.delete(user.into_inner()) {
+        Some(resp_str) => HttpResponse::Ok().json(resp_str),
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(register);
-    cfg.service(all);
+    cfg.service(registerall_user);
+    cfg.service(get_all_user);
+    cfg.service(update_user);
+    cfg.service(delete_user);
 }
