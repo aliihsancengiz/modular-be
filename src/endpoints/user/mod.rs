@@ -53,7 +53,18 @@ async fn delete_user(user: web::Json<models::user::User>, _: AuthorizationServic
     }
 }
 
+fn init_database() {
+    let mut usr = models::user::User {
+        id: 1,
+        username: "admin".to_string(),
+        password: "admin".to_string(),
+        email: "admin@admin.com".to_string(),
+    };
+    let mut ep_manager = UserEndpoint::new();
+    ep_manager.register(&mut usr).unwrap_or("".to_string());
+}
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
+    init_database();
     cfg.service(registerall_user);
     cfg.service(get_all_user);
     cfg.service(update_user);
