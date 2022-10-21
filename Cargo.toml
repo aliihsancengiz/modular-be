@@ -17,3 +17,6 @@ rust-crypto = "0.2.36"
 jsonwebtoken = "8.1.1"
 chrono = "0.4.22"
 futures = "0.3.24"
+
+[build-dependencies]
+envfile = "0.2.1"
