@@ -1,0 +1,8 @@
+DROP TABLE users;
+
+CREATE TABLE [users] (  
+	[username] NVARCHAR(50) PRIMARY KEY NOT NULL,
+	[email] NVARCHAR(50) NOT NULL,
+	[password] NVARCHAR(100) NOT NULL,
+	[role] NVARCHAR(10) NOT NULL
+); 
