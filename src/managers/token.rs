@@ -1,4 +1,4 @@
-use crate::models::user::User;
+use crate::models::user::{User, UserRole};
 use chrono::{Duration, Utc};
 use envfile::EnvFile;
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
@@ -10,6 +10,7 @@ pub struct Claims {
     pub sub: String,
     pub exp: usize,
     pub email: String,
+    pub role: UserRole,
 }
 
 pub struct Tokeniser {
@@ -27,9 +28,10 @@ impl Tokeniser {
         let _date = Utc::now() + Duration::hours(expiration_in_hours as i64);
 
         let my_claims = Claims {
-            sub: user.username,
+            sub: user.username.clone(),
             exp: _date.timestamp() as usize,
-            email: user.email,
+            email: user.email.clone(),
+            role: user.role_from_str(),
         };
         encode(
             &Header::default(),
@@ -39,21 +41,15 @@ impl Tokeniser {
         .unwrap()
     }
 
-    pub fn validate_token(&self, token: String) -> bool {
+    pub fn validate_token(&self, token: String) -> Option<UserRole> {
         let _decode = decode::<Claims>(
             token.as_str(),
             &DecodingKey::from_secret(self.secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         );
         match _decode {
-            Ok(decoded) => {
-                println!("{}", decoded.claims.sub.to_string());
-                true
-            }
-            Err(_) => {
-                println!("Error");
-                false
-            }
+            Ok(decoded_claim) => Some(decoded_claim.claims.role),
+            Err(_) => None,
         }
     }
 }

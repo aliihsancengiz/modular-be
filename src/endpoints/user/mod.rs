@@ -1,6 +1,6 @@
 pub mod user_ep;
 
-use crate::managers::auth::AuthorizationService;
+use crate::managers::auth::AsAdmin;
 use crate::models;
 use actix_web::{
     delete, get,
@@ -12,10 +12,7 @@ use actix_web::{
 use user_ep::UserEndpoint;
 
 #[post("")]
-async fn registerall_user(
-    user: web::Json<models::user::User>,
-    _: AuthorizationService,
-) -> HttpResponse {
+async fn registerall_user(user: web::Json<models::user::User>, _: AsAdmin) -> HttpResponse {
     let mut usr = user.into_inner();
     let mut ep_manager = UserEndpoint::new();
     match ep_manager.register(&mut usr) {
@@ -25,7 +22,7 @@ async fn registerall_user(
 }
 
 #[get("")]
-async fn get_all_user(_: AuthorizationService) -> HttpResponse {
+async fn get_all_user(_: AsAdmin) -> HttpResponse {
     let mut ep_manager = UserEndpoint::new();
     match ep_manager.all() {
         Some(resp) => HttpResponse::Ok()
@@ -36,7 +33,7 @@ async fn get_all_user(_: AuthorizationService) -> HttpResponse {
 }
 
 #[put("")]
-async fn update_user(user: web::Json<models::user::User>, _: AuthorizationService) -> HttpResponse {
+async fn update_user(user: web::Json<models::user::User>, _: AsAdmin) -> HttpResponse {
     let mut ep_manager = UserEndpoint::new();
     match ep_manager.update(&mut user.into_inner()) {
         Some(resp_str) => HttpResponse::Ok().json(resp_str),
@@ -45,7 +42,7 @@ async fn update_user(user: web::Json<models::user::User>, _: AuthorizationServic
 }
 
 #[delete("")]
-async fn delete_user(user: web::Json<models::user::User>, _: AuthorizationService) -> HttpResponse {
+async fn delete_user(user: web::Json<models::user::User>, _: AsAdmin) -> HttpResponse {
     let mut ep_manager = UserEndpoint::new();
     match ep_manager.delete(user.into_inner()) {
         Some(resp_str) => HttpResponse::Ok().json(resp_str),
@@ -55,10 +52,10 @@ async fn delete_user(user: web::Json<models::user::User>, _: AuthorizationServic
 
 fn init_database() {
     let mut usr = models::user::User {
-        id: 1,
         username: "admin".to_string(),
         password: "admin".to_string(),
         email: "admin@admin.com".to_string(),
+        role: "ADMIN".to_string(),
     };
     let mut ep_manager = UserEndpoint::new();
     ep_manager.register(&mut usr).unwrap_or("".to_string());
